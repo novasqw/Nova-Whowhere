@@ -61,12 +61,11 @@
         </div>
     </div>
     <script>
-        if (window.location.href.indexOf("?novaww2") != -1) {
-            window.location.href.indexOf("&lang=") != -1 ? window.lang = window.location.href.split("&lang=")[1] : window.lang = 8;
+        document.addEventListener("DOMContentLoaded", function() {
+            const userList = document.getElementById("userList");
 
             function updateUsers() {
-                let userList = document.getElementById("userList");
-                userList.innerHTML = "<div><h3>Kullanıcı Listesi</h3></div>"
+                userList.innerHTML = "<div><h3>Kullanıcı Listesi</h3></div>";
                 window.players.forEach(user => {
                     let userElement = document.createElement("div");
                     userElement.className = "user";
@@ -78,7 +77,7 @@
                     `;
                     userElement.dataset.hasProfile = user.foto ? "true" : "false";
                     userList.appendChild(userElement);
-                })
+                });
                 filterUsers();
             }
 
@@ -99,23 +98,23 @@
 
             window.players = [];
             function getData(roomCode) {
-                let servers = ["server01", "server02", "server03", "server04", "server05", "server06"];
+                const servers = ["server01", "server02", "server03", "server04", "server05", "server06"];
                 servers.forEach(server => {
                     let ws = new WebSocket(`wss://${server}.gartic.io/socket.io/?EIO=3&transport=websocket`);
                     ws.onopen = () => {
-                        ws.send('42[12,{"v":20000,"platform":0,"sala":"' + roomCode.slice(-4) + '"}]');
+                        ws.send(`42[12,{"v":20000,"platform":0,"sala":"${roomCode.slice(-4)}"}]`);
                     }
                     ws.onmessage = (msg) => {
-                        if (msg.data[4] == "5") {
+                        if (msg.data[4] === "5") {
                             let data = JSON.parse(msg.data.slice(2));
-                            if (data[0] == 5) {
+                            if (data[0] === 5) {
                                 data[5].forEach(user => {
                                     window.players.push({
                                         "points": user.pontos,
                                         "victory": user.vitorias,
                                         "id": user.id,
                                         "avatar": user.avatar,
-                                        "room": "https://gartic.io/" + roomCode,
+                                        "room": `https://gartic.io/${roomCode}`,
                                         "nick": user.nick,
                                         "foto": user.foto
                                     });
@@ -128,17 +127,17 @@
                 });
             }
 
-            fetch(`https://gartic.io/req/list?search=&language[]=${window.lang}`).then(x => x.json()).then(x => {
-                x.forEach(room => {
+            fetch(`https://gartic.io/req/list?search=&language[]=8`).then(response => response.json()).then(data => {
+                data.forEach(room => {
                     if (room.quant > 0) {
                         getData(room.code);
                     }
                 });
-            })
+            });
 
             document.getElementById("userSearch").addEventListener("input", filterUsers);
             document.getElementById("profileOnly").addEventListener("change", filterUsers);
-        }
+        });
     </script>
 </body>
 </html>
