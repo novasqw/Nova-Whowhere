@@ -1,333 +1,107 @@
 <!DOCTYPE html>
 <html>
 <head>
-	  <meta charset="utf-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>WebSocket</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>WebSocket - Oda Listesi</title>
     <script>
         var socket;
-
-        function conectar() {
-            var url = document.getElementById("url").value;
-            socket = new WebSocket(url);
-            
-            socket.onopen = function() {
-                console.log("WebSocket'e bağlandı");
-            };
-            
-            socket.onmessage = function(event) {
-                console.log("Mensagem recebida: " + event.data);
-                exibirMensagemRecebida(event.data);
-                exibirTextoRecebido(event.data);
-            };
-            
-            socket.onclose = function() {
-                console.log("Desconectado do WebSocket");
-            };
-        }
-
-        function Ayırmak() {
-            socket.close();
-        }
-
-        function enviarMensagem() {
-            var mensagem = document.getElementById("mensagem").value;
-            socket.send(mensagem);
-            document.getElementById("status").value = "Mensagem enviada: " + mensagem;
-        }
-
-        function exibirMensagemRecebida(mensagem) {
-            var mensagemAnterior = document.getElementById("mensagemRecebida").value;
-            document.getElementById("mensagemRecebida").value = mensagemAnterior + "\n" + "Mensagem recebida: " + mensagem;
-            
-        }
-
-        function exibirTextoRecebido(mensagem) {
-            var regexCode = /"kod":"([^"]+)"/g;
-            var regexQuant = /"miktar":([^"]+)/g;
-            var regexMaxPlayers = /"max":([^"]+)/g;
-            var regexNick = /"nick":"([^"]+)"/g;
-            var regexPontos = /"Dikiş":([^"]+)/g;
-            var regexVitorias = /"Zafer":([^"]+)/g;
-            var regexFoto = /"fotoğraf":"([^"]+)"/g;
-
-            var matchesCode = mensagem.match(regexCode);
-            var matchesQuant = mensagem.match(regexQuant);
-            var matchesMaxPlayers = mensagem.match(regexMaxPlayers);
-            var matchesNick = mensagem.match(regexNick);
-            var matchesPontos = mensagem.match(regexPontos);
-            var matchesVitorias = mensagem.match(regexVitorias);
-            var matchesFoto = mensagem.match(regexFoto);
-
-            var conteudo = "";
-
-            if (matchesCode && matchesQuant && matchesMaxPlayers) {
-                for (var i = 0; i < matchesCode.length; i++) {
-                    var matchCode = matchesCode[i];
-                    var codigo = matchCode.substring(8, matchCode.length - 1);
-
-                    var matchQuant = matchesQuant[i];
-                    var quantidade = matchQuant.substring(8, matchQuant.length - 1);
-
-                    var matchMaxPlayers = matchesMaxPlayers[i];
-                    var maxPlayers = matchMaxPlayers.substring(6);
-
-                    conteudo += "Oda Kodu: " + kod + ", miktar: " + miktar + ", Maksimum oyuncu sayısı: " + Maksimum oyuncu sayısı + "\n";
-                }
-            }
-
-            if (matchesNick && matchesPontos && matchesVitorias) {
-                for (var i = 0; i < matchesNick.length; i++) {
-                    var matchNick = matchesNick[i];
-                    var nick = matchNick.substring(8, matchNick.length - 1);
-
-                    var matchPontos = matchesPontos[i];
-                    var pontos = matchPontos.substring(9, matchPontos.length - 1);
-
-                    var matchVitorias = matchesVitorias[i];
-                    var vitorias = matchVitorias.substring(11);
-
-                    conteudo += "Nick: " + nick + ", Pontos: " + pontos + ", Vitórias: " + vitorias + "\n";
-                }
-            }
-
-            if (matchesFoto) {
-                for (var i = 0; i < matchesFoto.length; i++) {
-                    var matchFoto = matchesFoto[i];
-                    var foto = matchFoto.substring(8, matchFoto.length - 1);
-
-                    var imagem = document.createElement("img");
-                    imagem.src = foto;
-
-                    var quadro = document.createElement("div");
-                    quadro.className = "quadro";
-                    quadro.appendChild(imagem);
-
-                    document.getElementById("fotoRecebida").appendChild(quadro);
-                }
-            }
-
-            var textoAtual = document.getElementById("textoRecebido").value;
-            var novoTexto = (textoAtual + "\n" + conteudo).trim();
-            document.getElementById("textoRecebido").value = novoTexto;
-        }
         
-function connectToWebsockets() {
-const salaInput = document.getElementById('sala');
-const sala = salaInput.value;
+        function connectToWebSocket() {
+            const url = 'wss://server05.gartic.io/socket.io/?c=528661&EIO=3&transport=websocket';
+            socket = new WebSocket(url);
 
-const statusTextarea = document.getElementById('status');
-const mensagemRecebidaTextarea = document.getElementById('mensagemRecebida');
-const fotoRecebidaDiv = document.getElementById('fotoRecebida');
-const textoRecebidoTextarea = document.getElementById('textoRecebido');
+            socket.onopen = function() {
+                console.log("WebSocket bağlantısı kuruldu");
+                const message = `42\n[4, {\n "v": 20000,\n "nick": "Kullanıcı",\n "avatar": 0,\n "platform": 5,\n "sala": ""\n}]`;
+                socket.send(message);
+            };
 
-const servers = [
-  'wss://server01.gartic.io/socket.io/?c=528661&EIO=3&transport=websocket',
-  'wss://server02.gartic.io/socket.io/?c=528661&EIO=3&transport=websocket',
-  'wss://server03.gartic.io/socket.io/?c=528661&EIO=3&transport=websocket',
-  'wss://server04.gartic.io/socket.io/?c=528661&EIO=3&transport=websocket',
-  'wss://server05.gartic.io/socket.io/?c=528661&EIO=3&transport=websocket',
-  'wss://server06.gartic.io/socket.io/?c=528661&EIO=3&transport=websocket',
-  'wss://server07.gartic.io/socket.io/?c=528661&EIO=3&transport=websocket',
-];
+            socket.onmessage = function(event) {
+                if (event.data.indexOf('42["4"') != -1) {
+                    let objList = JSON.parse('["4"' + event.data.split('42["4"')[1]);
+                    document.querySelector(".values").innerHTML = '';
+                    objList[3].forEach(room => {
+                        if (room.quant > 1) {
+                            document.querySelector(".values").innerHTML += `
+                                <div class="value">
+                                    <p>Oda Kodu: ${room.code}, Maksimum Oyuncu Sayısı: ${room.max}, Oyuncu Sayısı: ${room.quant}</p>
+                                </div>`;
+                        }
+                    });
+                }
+            };
 
-servers.forEach((serverUrl, index) => {
-  const websocket = new WebSocket(serverUrl);
+            socket.onerror = function(error) {
+                console.error("WebSocket bağlantı hatası:", error);
+            };
+        }
 
-  websocket.onopen = () => {
-
-    const message = `42\n[12, {\n  "v": 20000,\n  "nick": "User4275",\n  "avatar": 0,\n  "platform": ${index + 1},\n  "sala": "${sala.substring()}"\n}]`;
-
-    websocket.send(message);
-
-  };
-
-  websocket.onmessage = (event) => {
-                if(event.data.indexOf('42["5"')!=-1){
-                	      let objlist=JSON.parse('["5"'+event.data.split('42["5"')[1])
-
-                for (var i = 0; i < objlist[5].length; i++) {
-                	
-if(objlist[5][i].foto){
-    document.querySelector(".values").innerHTML+=`<div class="value">
-<div class="msgbox"><img width="100" style="margin-top:-5px;" height="100" src="`+objlist[5][i].foto+`"></img><button href="`+objlist[5][i].foto+`" download="file`+Date.now()+`" style="margin-left:10px"><svg focusable="false" width="40" height="40" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M18 15v3H6v-3H4v3c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2v-3h-2z"></path><path d="M17 11.5l-1.41-1.41L13 12.67V4h-2v8.67l-2.59-2.58L7 11.5l5 5z"></path></svg></button></div><p>Player: `+ objlist[5][i].nick +` ,  Trophies: `+ objlist[5][i].vitorias +` ,  Points: `+ objlist[5][i].pontos+`</p></div>`
-}
-if(!objlist[5][i].foto && objlist[5][i].avatar){
-    document.querySelector(".values").innerHTML+=`<div class="value">
-<img width="100" style="margin-top:-5px;" height="100" src="https://gartic.io/static/images/avatar/svg/`+objlist[5][i].avatar+`.svg"></img><p>Player: `+ objlist[5][i].nick +` ,Trophies: `+ objlist[5][i].vitorias +` , Points: `+ objlist[5][i].pontos+`</p></div>`
-}
-}
-                	}
-  websocket.onerror = (error) => {
-    console.error(`Erro ao conectar-se a ${serverUrl}: ${error}`);
-
-  };
-}})
-}
-function serverOnlineSee() {
-
-const servers = [
-  'wss://server01.gartic.io/socket.io/?c=528661&EIO=3&transport=websocket',
-  'wss://server02.gartic.io/socket.io/?c=528661&EIO=3&transport=websocket',
-  'wss://server03.gartic.io/socket.io/?c=528661&EIO=3&transport=websocket',
-  'wss://server04.gartic.io/socket.io/?c=528661&EIO=3&transport=websocket',
-  'wss://server05.gartic.io/socket.io/?c=528661&EIO=3&transport=websocket',
-  'wss://server06.gartic.io/socket.io/?c=528661&EIO=3&transport=websocket',
-  'wss://server07.gartic.io/socket.io/?c=528661&EIO=3&transport=websocket',
-];
-
-servers.forEach((serverUrl, index) => {
-  const websocket = new WebSocket(serverUrl);
-
-  websocket.onopen = () => {
-
-
-    const message = `42\n[4, {\n  "v": 20000,\n  "nick": "User4275",\n  "avatar": 0,\n  "platform": ${index + 1},\n  "sala": ""\n}]`;
-
-    websocket.send(message);
-  };
-
-
-websocket.onmessage = function(event) {
-
-                if(event.data.indexOf('42["4"')!=-1){
-                    let objlist=JSON.parse('["4"'+event.data.split('42["4"')[1])
-for (var i = 0; i < objlist[3].length; i++) {
-	if (objlist[3][i].quant > 1){
-  document.querySelector(".values").innerHTML+=`<div class="value">
-<img width="100" style="margin-top:-5px;" height="100" src="https://gartic.io/static/images/subjects/`+objlist[3][i].subject+`.svg"><p>Room code: `+ objlist[3][i].code + `, + Max players:` + objlist[3][i].max + `, Quantity of players:` + objlist[3][i].quant+`</p></div>`}
-}
-for (var i = 0; i < objlist[4].length; i++) {
-  console.log("Room code:" + objlist[4][i].code + "," + "Max players:" + objlist[4][i].max + "," + "Quantity of players:" + objlist[4][i].quant);
-}
-
-  }; 
-   
-  };
-
-  websocket.onerror = (error) => {
-    console.error(`Erro ao conectar-se a ${serverUrl}: ${error}`);
-
-  };
-});
-}
-
-
-function limparChats() {
-	
-  // Limpar os campos de texto
-  document.getElementById("status").value = "";
-  document.getElementById("mensagemRecebida").value = "";
-  document.getElementById("textoRecebido").value = "";
-
-  // Remover as imagens com a classe "quadro"
-  let imagens = document.querySelectorAll("#fotoRecebida > div");
-  imagens.forEach(function(imagem) {
-    imagem.remove();
-  });
-}
+        function clearList() {
+            document.querySelector(".values").innerHTML = '';
+        }
     </script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Roboto&display=swap');
-            body {
-      margin: 0;
-      padding: 0;
-      height: 100vh;
-      background: linear-gradient(to right, red, orange, #FFD700);
-      overflow: hidden;
-      position: relative;
-    }
-        .userlist *{box-sizing:border-box;}
-
-
-        .userlist {
-            display:block;text-align:center;opacity:none;font-size:10pt;color:#FFD700;font-style:italic;
-            position:fixed;left:50%;top:3px;padding:5px 3px !important;margin:0px;background:#333333;font-family: 'Roboto', sans-serif;border:2px solid #303132;
-            transform:translate(-50%,0);border-radius:15px;z-index:999999999;display:block !important;height:auto !important;width:200px !important;
+        body {
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            background-color: #00BFFF; /* Deniz mavisi */
+            overflow: hidden;
+            font-family: 'Arial', sans-serif;
         }
-
-        .userlist input[type=text]{height:20px;border-radius:3px;font-size:9pt;background:brown;color:white;padding-left:3px;}
-        .userlist input[type=submit]{height:25px;border-radius:3px;background:#FFD700;}
-        .userlist input[type=checkbox]{margin-top:2px;}
-
-        #background{
-        z-index:999;width:0px;height:0px;position:fixed;left:0px;top:0px;
-        }
-        .option *{box-sizing:border-box;}
-
         .option {
-
-            display:block;text-align:center;opacity:none;font-size:10pt;color:#FFD700;
-            position:fixed;left:50%;top:-20px;padding:5px 3px !important;margin:0px;background:#333333;font-family: 'Roboto', sans-serif;border:2px solid #303132;
-            transform:translate(-50%,0);border-radius:15px;z-index:999999999;display:block !important;height:auto !important;width:200px !important;
+            position: fixed;
+            left: 50%;
+            top: 20px;
+            padding: 10px;
+            background: #333;
+            color: #FFD700;
+            border-radius: 10px;
+            transform: translateX(-50%);
+            z-index: 1000;
         }
-
-        .option input[type=submit],.icebotbtn button{cursor:pointer;border:none;background:#FFD700;color:#000000;padding:5px 0px;border-radius:5px;font-size:11pt;margin-top:5px;}
-        .option input[type=checkbox]{margin-top:2px;}
-        .option input[type=submit]:hover{background:#ccad00;transition:0.2s;}
-
-        .icebot *{box-sizing:border-box;}
-
-        
-
-        #icebot1 {
-            overflow-x:hidden;width:100%;max-height:600px;overflow-y:scroll;
-            display:block;text-align:center;opacity:none;font-size:10pt;color:#FFD700;
-            position:fixed;left:50%;top:50px;padding:5px 3px !important;margin:0px;background:#333333;font-family: 'Roboto', sans-serif;border:2px solid #303132;
-            transform:translate(-50%,0);border-radius:15px;z-index:999999999;display:block;height:auto !important;width:350px !important;
-            
-
+        .values {
+            position: fixed;
+            left: 50%;
+            top: 100px;
+            padding: 10px;
+            background: #333;
+            color: #FFD700;
+            border-radius: 10px;
+            transform: translateX(-50%);
+            overflow-y: auto;
+            height: calc(100vh - 120px);
+            width: 80%;
+            max-width: 600px;
+            z-index: 1000;
         }
-              .values {
-            overflow-x:hidden;width:100%;max-height:400px;overflow-y:scroll;
-            display:block;text-align:center;opacity:none;font-size:10pt;color:#FFD700;
-            position:fixed;left:50%;top:225px;padding:5px 3px !important;margin:0px;background:#333333;font-family: 'Roboto', sans-serif;border:2px solid #303132;
-            transform:translate(-50%,0);border-radius:15px;z-index:999999999;display:block;height:auto !important;width:350px !important;
-            
-
+        .values .value {
+            background: #444;
+            margin: 5px 0;
+            padding: 10px;
+            border-radius: 5px;
         }
-
-        .icebot input[type=submit],.icebotbtn button{cursor:pointer;border:none;background:#FFD700;color:#000000;padding:5px 0px;border-radius:5px;font-size:11pt;margin-top:5px;}
-        .icebot input[type=checkbox]{margin-top:2px;}
-        .icebot input[type=submit]:hover{background:#ccad00;transition:0.2s;}
-        .icebot input[type=range]{accent-color:#FFD700;}
-        .icebot input[type=range]:focus::-webkit-slider-runnable-track { background: #3071A9; }
-
-
-        .mbtn{width:20%;}
-                .mbtn{display:flex;align-items:center;justify-content:center;}
-        .mbtn input[type=submit],.mbtn button{cursor:pointer;border:none;background:#FFD700;color:#000000;padding:5px 0px;border-radius:5px;font-size:11pt;margin-top:5px;}
-        .mbtn button:hover{background:#ccad00;transition:0.2s;}
-
-        .msgbox{display:flex;align-items:center;justify-content:center;}
-        .msgbox input[type=text]{margin-top:4px !important;width:75% !important;height:23px !important;}
-        .msgbox input[type=submit],.msgbox button{cursor:pointer;border:none;background:#FFD700;color:#000000;padding:5px 0px;border-radius:5px;font-size:11pt;margin-top:5px;}
-        .msgbox button:hover{background:#ccad00;transition:0.2s;}
-
+        .button {
+            background: #FFD700;
+            color: #000;
+            border: none;
+            border-radius: 5px;
+            padding: 10px 20px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        .button:hover {
+            background: #ccad00;
+            transition: 0.2s;
+        }
     </style>
 </head>
 <body>
-	<div class="option"><h1 style="font-size:30px">ICEspy</h1></div>
-	<div class="icebot">
-		
-	<div id="icebot1">
-		<div class="msgbox">
-    <input type="text" id="url" placeholder="Digite a URL do WebSocket" />
-    <button onclick="conectar()">Conectar</button>
-    <button  onclick="desconectar()">Desconectar</button></div>
-    
-    <input type="text" id="mensagem" placeholder="Digite a mensagem a ser enviada" <input/>
-    <input type="submit" onclick="enviarMensagem()" value="Enviar"></input>
-     <input type="text" id="sala" placeholder="Digite o servidor"</input>
-    <input type="submit" onclick="connectToWebsockets()" value="Enviar ao servidor"></input>
-    
-
-     <input type="submit"  onclick="serverOnlineSee()" value="Ver servidores online"></input>
-    
-     <input type="submit" id="limparchat" onclick="limparChats()" value="Limpar chats"></input>
-
+    <div class="option">
+        <button class="button" onclick="connectToWebSocket()">Odalara Bağlan</button>
+        <button class="button" onclick="clearList()">Listeyi Temizle</button>
     </div>
     <div class="values"></div>
-    </div>
 </body>
 </html>
