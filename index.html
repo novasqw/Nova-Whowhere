@@ -6,7 +6,7 @@
     <title>WebSocket - Oda Listesi</title>
     <script>
         var socket;
-        
+
         function connectToWebSocket() {
             const url = 'wss://server05.gartic.io/socket.io/?c=528661&EIO=3&transport=websocket';
             socket = new WebSocket(url);
@@ -25,7 +25,9 @@
                         if (room.quant > 1) {
                             document.querySelector(".values").innerHTML += `
                                 <div class="value">
-                                    <p>Oda Kodu: ${room.code}, Maksimum Oyuncu Sayısı: ${room.max}, Oyuncu Sayısı: ${room.quant}</p>
+                                    Oda Kodu: ${room.code}<br>
+                                    Maksimum Oyuncu Sayısı: ${room.max}<br>
+                                    Oyuncu Sayısı: ${room.quant}
                                 </div>`;
                         }
                     });
@@ -35,6 +37,16 @@
             socket.onerror = function(error) {
                 console.error("WebSocket bağlantı hatası:", error);
             };
+        }
+
+        function sendMessage() {
+            const message = document.getElementById("message").value;
+            if (socket && socket.readyState === WebSocket.OPEN) {
+                socket.send(message);
+                document.getElementById("status").innerText = `Mesaj gönderildi: ${message}`;
+            } else {
+                document.getElementById("status").innerText = "WebSocket bağlantısı yok.";
+            }
         }
 
         function clearList() {
@@ -47,7 +59,6 @@
             padding: 0;
             height: 100vh;
             background-color: #00BFFF; /* Deniz mavisi */
-            overflow: hidden;
             font-family: 'Arial', sans-serif;
         }
         .option {
@@ -81,6 +92,7 @@
             margin: 5px 0;
             padding: 10px;
             border-radius: 5px;
+            font-size: 14px;
         }
         .button {
             background: #FFD700;
@@ -90,10 +102,22 @@
             padding: 10px 20px;
             cursor: pointer;
             font-size: 16px;
+            margin: 5px;
         }
         .button:hover {
             background: #ccad00;
             transition: 0.2s;
+        }
+        #message {
+            width: calc(100% - 40px);
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #333;
+            margin: 5px;
+        }
+        #status {
+            color: #FFD700;
+            margin: 5px;
         }
     </style>
 </head>
@@ -101,6 +125,9 @@
     <div class="option">
         <button class="button" onclick="connectToWebSocket()">Odalara Bağlan</button>
         <button class="button" onclick="clearList()">Listeyi Temizle</button>
+        <input type="text" id="message" placeholder="Mesajınızı buraya girin">
+        <button class="button" onclick="sendMessage()">Mesaj Gönder</button>
+        <div id="status"></div>
     </div>
     <div class="values"></div>
 </body>
