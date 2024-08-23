@@ -1,4 +1,4 @@
- let params = new URLSearchParams(window.location.search);
+let params = new URLSearchParams(window.location.search);
 document.body.innerHTML += `
 <div class="ui inverted segment">
   <div class="ui inverted form">
