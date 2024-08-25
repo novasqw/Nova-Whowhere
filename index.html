@@ -1,90 +1,107 @@
-a<!doctype html>
-<html>
-
+<!DOCTYPE html>
+<html lang="en">
 <head>
-	<meta charset="utf-8">
-	<meta name="viewport" content="width=device-width,initial-scale=1">
-	<title>qwe</title>
-	<link rel="icon" href="./favicon.png" type="image/gif">
-	<style>
-		body {
-			width: 100%;
-			height: 100%;
-		}
-	</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bot Site</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #282c34;
+            color: white;
+            margin: 0;
+            padding: 0;
+        }
+        h1 {
+            font-size: 3em;
+            color: white;
+        }
+        .button-container {
+            margin: 20px;
+        }
+        .button {
+            background-color: red;
+            border: none;
+            color: white;
+            padding: 15px 32px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin: 4px 2px;
+            cursor: pointer;
+        }
+        .iframe-container {
+            position: relative;
+            display: inline-block;
+            margin: 5px;
+        }
+        .iframe-container iframe {
+            width: 300px;
+            height: 200px;
+            border: none;
+            display: none;
+        }
+        .iframe-container .close-button {
+            position: absolute;
+            top: 0;
+            left: 0;
+            background-color: green;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            cursor: pointer;
+        }
+    </style>
 </head>
-
 <body>
-	<script src="https://code.jquery.com/jquery-3.6.0.js"
-		integrity="sha256-H+K7U5CnXl1h5ywQfKtSj8PCmoN9aaq30gDh27Xc0jk=" crossorigin="anonymous"></script>
-	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/izitoast/1.4.0/css/iziToast.min.css">
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/izitoast/1.4.0/js/iziToast.min.js"
-		type="text/javascript"></script>
-	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.4.1/semantic.min.css">
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.4.1/semantic.min.js"
-		type="text/javascript"></script>
-	<script src="Script.js"></script>
-	<style>
-		@font-face {
-			font-family: 'Roboto';
-			src: url(fonts/Roboto-Regular.ttf);
-		}
+    <h1>Bot Site</h1>
+    <div class="button-container">
+        <button class="button" id="play-button">Play</button>
+        <button class="button" id="exit-button">Exit</button>
+        <button class="button" id="iframe-button">Iframe</button>
+    </div>
 
-		@font-face {
-			font-family: 'Roboto';
-			font-weight: 300;
-			src: url(fonts/Roboto-Light.ttf);
-		}
+    <script>
+        let iframes = [];
 
-		@font-face {
-			font-family: 'Roboto';
-			font-weight: 500;
-			src: url(fonts/Roboto-Medium.ttf);
-		}
+        function createIframe() {
+            const iframeContainer = document.createElement('div');
+            iframeContainer.className = 'iframe-container';
 
-		/* Contextmenu CSS kodu */
-		#contextmenu {
-			display: none;
-			position: absolute;
-			background-color: #2b2f33;
-			/* arkaplan rengi */
-			border-radius: 4px;
-			border: none;
-			width: 120px;
-			z-index: 999999;
-		}
+            const iframe = document.createElement('iframe');
+            iframe.src = 'https://blockaway.site';  // or any URL you want
+            iframeContainer.appendChild(iframe);
 
-		#contextmenu ul {
-			list-style: none;
-			margin: 0;
-			padding: 0;
-		}
+            const closeButton = document.createElement('button');
+            closeButton.className = 'close-button';
+            closeButton.textContent = 'Close';
+            closeButton.onclick = () => {
+                iframeContainer.remove();
+                iframes = iframes.filter(iframeObj => iframeObj !== iframeContainer);
+            };
+            iframeContainer.appendChild(closeButton);
 
-		#contextmenu li {
-			padding: 8px 10px;
-			cursor: pointer;
-			color: #fff;
-			/* metin rengi */
-		}
+            document.body.appendChild(iframeContainer);
+            iframes.push(iframeContainer);
+        }
 
-		#contextmenu li:hover {
-			background-color: #3e4347;
-			border-radius: 4px;
-			/* hover rengi */
-		}
-	</style>
+        document.getElementById('play-button').onclick = () => {
+            iframes.forEach(container => {
+                const iframe = container.querySelector('iframe');
+                iframe.contentWindow.postMessage({ type: 'click', selector: '.ic-playHome' }, '*');
+            });
+        };
 
-	<!-- Contextmenu HTML kodu -->
-	<div id="contextmenu">
-		<ul>
-			<li id="editButton">Edit</li>
-			<li id="copyButton">Copy</li>
-			<li id="cutButton">Cut</li>
-			<li id="pasteButton">Paste</li>
-			<li id="saveImageButton">Save Image</li>
-		</ul>
-	</div>
+        document.getElementById('exit-button').onclick = () => {
+            iframes.forEach(container => {
+                const iframe = container.querySelector('iframe');
+                iframe.contentWindow.postMessage({ type: 'click', selector: '.exit' }, '*');
+            });
+        };
 
+        document.getElementById('iframe-button').onclick = createIframe;
+    </script>
 </body>
-
 </html>
