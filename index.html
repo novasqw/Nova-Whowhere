@@ -3,104 +3,147 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bot Site</title>
+    <title>Gartic.io Iframes via Proxy</title>
     <style>
         body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background-color: #2c3e50;
+            color: #ecf0f1;
             font-family: Arial, sans-serif;
-            text-align: center;
-            background-color: #282c34;
-            color: white;
             margin: 0;
-            padding: 0;
+            padding: 20px;
         }
+
         h1 {
-            font-size: 3em;
-            color: white;
+            font-size: 32px;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
         }
-        .button-container {
-            margin: 20px;
+
+        label {
+            font-size: 18px;
+            margin-bottom: 10px;
         }
-        .button {
-            background-color: red;
-            border: none;
-            color: white;
-            padding: 15px 32px;
+
+        input[type="number"] {
+            width: 60px;
+            padding: 8px;
+            font-size: 18px;
             text-align: center;
-            text-decoration: none;
-            display: inline-block;
-            font-size: 16px;
-            margin: 4px 2px;
-            cursor: pointer;
+            border: 2px solid #2980b9;
+            border-radius: 4px;
+            margin-right: 10px;
         }
-        .iframe-container {
-            position: relative;
-            margin: 10px auto;
-            width: 80%;
-        }
-        .iframe-container iframe {
-            width: 100%;
-            height: 500px;
-            border: none;
-        }
-        .iframe-container .close-button {
-            position: absolute;
-            top: 10px;
-            left: 10px;
-            background-color: green;
+
+        button {
+            padding: 10px 20px;
+            font-size: 18px;
+            background-color: #3498db;
             color: white;
             border: none;
-            padding: 5px 10px;
+            border-radius: 5px;
             cursor: pointer;
+            transition: background-color 0.3s ease;
+            margin: 10px;
+        }
+
+        button:hover {
+            background-color: #2980b9;
+        }
+
+        #iframeContainer {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin-top: 20px;
+            gap: 20px;
+        }
+
+        iframe {
+            width: 600px;
+            height: 400px;
+            border: none;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+            transition: transform 0.3s ease;
+        }
+
+        iframe:hover {
+            transform: scale(1.05);
         }
     </style>
 </head>
 <body>
-    <h1>Bot Site</h1>
-    <div class="button-container">
-        <button class="button" id="play-button">Play</button>
-        <button class="button" id="exit-button">Exit</button>
-        <button class="button" id="iframe-button">Iframe</button>
-    </div>
+
+    <h1>Gartic.io Iframes via Proxy</h1>
+
+    <!-- Campo para escolher a quantidade de iframes -->
+    <label for="iframeCount">Número de iframes:</label>
+    <input type="number" id="iframeCount" min="1" max="10" value="1">
+
+    <!-- Botão para carregar os iframes -->
+    <button id="playButton">Play</button>
+
+    <!-- Botão para clicar em "Join" nos iframes -->
+    <button id="joinButton">Join</button>
+
+    <!-- Botão para acionar a saída dos bots -->
+    <button id="exitButton">Exit</button>
+
+    <!-- Container para os iframes -->
+    <div id="iframeContainer"></div>
 
     <script>
-        let iframes = [];
+        const playButton = document.getElementById('playButton');
+        const joinButton = document.getElementById('joinButton');
+        const exitButton = document.getElementById('exitButton');
+        const iframeContainer = document.getElementById('iframeContainer');
 
-        function createIframe() {
-            const iframeContainer = document.createElement('div');
-            iframeContainer.className = 'iframe-container';
+        playButton.addEventListener('click', function() {
+            // Limpa o container de iframes
+            iframeContainer.innerHTML = '';
 
-            const iframe = document.createElement('iframe');
-            iframe.src = 'https://blockaway.site';  // or any URL you want
-            iframeContainer.appendChild(iframe);
+            // Pega o número de iframes escolhido
+            const iframeCount = document.getElementById('iframeCount').value;
 
-            const closeButton = document.createElement('button');
-            closeButton.className = 'close-button';
-            closeButton.textContent = 'Close';
-            closeButton.onclick = () => {
-                iframeContainer.remove();
-                iframes = iframes.filter(iframeObj => iframeObj !== iframeContainer);
-            };
-            iframeContainer.appendChild(closeButton);
+            // Cria e adiciona os iframes ao container
+            for (let i = 0; i < iframeCount; i++) {
+                const iframe = document.createElement('iframe');
+                iframe.src = 'https://blockaway.net';
+                iframeContainer.appendChild(iframe);
+            }
+        });
 
-            document.body.appendChild(iframeContainer);
-            iframes.push(iframeContainer);
-        }
-
-        document.getElementById('play-button').onclick = () => {
-            iframes.forEach(container => {
-                const iframe = container.querySelector('iframe');
-                iframe.contentWindow.postMessage({ type: 'click', selector: '.ic-playHome' }, '*');
+        joinButton.addEventListener('click', function() {
+            // Itera sobre todos os iframes
+            const iframes = iframeContainer.querySelectorAll('iframe');
+            iframes.forEach(iframe => {
+                // Tenta acessar o conteúdo do iframe e clicar no botão pelo XPath
+                try {
+                    const iframeDocument = iframe.contentDocument || iframe.contentWindow.document;
+                    const joinButton = iframeDocument.evaluate(
+                        '//*[@id="screens"]/div/div[2]/div[2]/button',
+                        iframeDocument, 
+                        null, 
+                        XPathResult.FIRST_ORDERED_NODE_TYPE, 
+                        null
+                    ).singleNodeValue;
+                    if (joinButton) {
+                        joinButton.click();
+                    }
+                } catch (e) {
+                    console.error('Não foi possível acessar o conteúdo do iframe ou clicar no botão:', e);
+                }
             });
-        };
+        });
 
-        document.getElementById('exit-button').onclick = () => {
-            iframes.forEach(container => {
-                const iframe = container.querySelector('iframe');
-                iframe.contentWindow.postMessage({ type: 'click', selector: '.exit' }, '*');
-            });
-        };
-
-        document.getElementById('iframe-button').onclick = createIframe;
+        exitButton.addEventListener('click', function() {
+            // Limpa o container de iframes
+            iframeContainer.innerHTML = '';
+        });
     </script>
+
 </body>
 </html>
