@@ -17,9 +17,8 @@
             margin-top: 50px;
         }
         .button {
-            background-color: yellow;
             border: none;
-            color: black;
+            color: white;
             padding: 15px 32px;
             text-align: center;
             text-decoration: none;
@@ -28,13 +27,15 @@
             margin: 20px 2px;
             cursor: pointer;
         }
+        .button-open {
+            background-color: yellow;
+            color: black;
+        }
         .button-join {
             background-color: blue;
-            color: white;
         }
         .button-close {
             background-color: red;
-            color: white;
         }
         .iframe-container {
             display: flex;
@@ -52,14 +53,20 @@
 </head>
 <body>
     <div class="header">BOT</div>
-    <button class="button button-join" onclick="openIframes()">Open Iframes</button>
+    <button class="button button-open" onclick="openIframes()">Open Iframes</button>
+    <button class="button button-join" onclick="joinIframes()">Join</button>
     <div class="iframe-container" id="iframeContainer"></div>
 
     <script>
         let iframeCount = 0;
+        let iframes = [];
 
         function openIframes() {
             const container = document.getElementById('iframeContainer');
+
+            // Clear existing iframes
+            container.innerHTML = '';
+            iframes = [];
 
             // Create new iframes
             for (let i = 0; i < 3; i++) {
@@ -76,13 +83,31 @@
                 closeButton.className = 'button button-close';
                 closeButton.onclick = function() {
                     container.removeChild(iframeDiv);
+                    // Remove from the iframes list
+                    iframes = iframes.filter(iframe => iframe !== iframe);
                 };
 
                 iframeDiv.appendChild(iframe);
                 iframeDiv.appendChild(closeButton);
                 container.appendChild(iframeDiv);
+
+                // Add to the iframes list
+                iframes.push(iframe);
             }
         }
+
+        function joinIframes() {
+            iframes.forEach(iframe => {
+                iframe.contentWindow.postMessage({ type: 'click', selector: '.ic-playHome' }, '*');
+            });
+        }
+
+        // Listen for messages from iframes
+        window.addEventListener('message', (event) => {
+            if (event.data.type === 'click') {
+                document.querySelector(event.data.selector)?.click();
+            }
+        });
     </script>
 </body>
 </html>
