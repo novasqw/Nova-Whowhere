@@ -3,147 +3,86 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gartic.io Iframes via Proxy</title>
+    <title>Bot</title>
     <style>
         body {
+            text-align: center;
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+        }
+        .header {
+            font-size: 48px;
+            font-weight: bold;
+            margin-top: 50px;
+        }
+        .button {
+            background-color: yellow;
+            border: none;
+            color: black;
+            padding: 15px 32px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin: 20px 2px;
+            cursor: pointer;
+        }
+        .button-join {
+            background-color: blue;
+            color: white;
+        }
+        .button-close {
+            background-color: red;
+            color: white;
+        }
+        .iframe-container {
             display: flex;
             flex-direction: column;
             align-items: center;
-            background-color: #2c3e50;
-            color: #ecf0f1;
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 20px;
-        }
-
-        h1 {
-            font-size: 32px;
-            margin-bottom: 20px;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
-        }
-
-        label {
-            font-size: 18px;
-            margin-bottom: 10px;
-        }
-
-        input[type="number"] {
-            width: 60px;
-            padding: 8px;
-            font-size: 18px;
-            text-align: center;
-            border: 2px solid #2980b9;
-            border-radius: 4px;
-            margin-right: 10px;
-        }
-
-        button {
-            padding: 10px 20px;
-            font-size: 18px;
-            background-color: #3498db;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-            margin: 10px;
-        }
-
-        button:hover {
-            background-color: #2980b9;
-        }
-
-        #iframeContainer {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
             margin-top: 20px;
-            gap: 20px;
         }
-
-        iframe {
+        .iframe-container iframe {
             width: 600px;
             height: 400px;
-            border: none;
-            border-radius: 10px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
-            transition: transform 0.3s ease;
-        }
-
-        iframe:hover {
-            transform: scale(1.05);
+            border: 2px solid black;
+            margin-bottom: 10px;
         }
     </style>
 </head>
 <body>
-
-    <h1>Gartic.io Iframes via Proxy</h1>
-
-    <!-- Campo para escolher a quantidade de iframes -->
-    <label for="iframeCount">Número de iframes:</label>
-    <input type="number" id="iframeCount" min="1" max="10" value="1">
-
-    <!-- Botão para carregar os iframes -->
-    <button id="playButton">Play</button>
-
-    <!-- Botão para clicar em "Join" nos iframes -->
-    <button id="joinButton">Join</button>
-
-    <!-- Botão para acionar a saída dos bots -->
-    <button id="exitButton">Exit</button>
-
-    <!-- Container para os iframes -->
-    <div id="iframeContainer"></div>
+    <div class="header">BOT</div>
+    <button class="button button-join" onclick="openIframes()">Open Iframes</button>
+    <div class="iframe-container" id="iframeContainer"></div>
 
     <script>
-        const playButton = document.getElementById('playButton');
-        const joinButton = document.getElementById('joinButton');
-        const exitButton = document.getElementById('exitButton');
-        const iframeContainer = document.getElementById('iframeContainer');
+        let iframeCount = 0;
 
-        playButton.addEventListener('click', function() {
-            // Limpa o container de iframes
-            iframeContainer.innerHTML = '';
+        function openIframes() {
+            const container = document.getElementById('iframeContainer');
 
-            // Pega o número de iframes escolhido
-            const iframeCount = document.getElementById('iframeCount').value;
+            // Create new iframes
+            for (let i = 0; i < 3; i++) {
+                iframeCount++;
+                const iframeDiv = document.createElement('div');
+                iframeDiv.style.marginBottom = '10px';
 
-            // Cria e adiciona os iframes ao container
-            for (let i = 0; i < iframeCount; i++) {
                 const iframe = document.createElement('iframe');
-                iframe.src = 'https://blockaway.net';
-                iframeContainer.appendChild(iframe);
+                iframe.src = 'https://example.com'; // Replace with desired URL
+                iframe.id = 'iframe-' + iframeCount;
+
+                const closeButton = document.createElement('button');
+                closeButton.textContent = 'Close';
+                closeButton.className = 'button button-close';
+                closeButton.onclick = function() {
+                    container.removeChild(iframeDiv);
+                };
+
+                iframeDiv.appendChild(iframe);
+                iframeDiv.appendChild(closeButton);
+                container.appendChild(iframeDiv);
             }
-        });
-
-        joinButton.addEventListener('click', function() {
-            // Itera sobre todos os iframes
-            const iframes = iframeContainer.querySelectorAll('iframe');
-            iframes.forEach(iframe => {
-                // Tenta acessar o conteúdo do iframe e clicar no botão pelo XPath
-                try {
-                    const iframeDocument = iframe.contentDocument || iframe.contentWindow.document;
-                    const joinButton = iframeDocument.evaluate(
-                        '//*[@id="screens"]/div/div[2]/div[2]/button',
-                        iframeDocument, 
-                        null, 
-                        XPathResult.FIRST_ORDERED_NODE_TYPE, 
-                        null
-                    ).singleNodeValue;
-                    if (joinButton) {
-                        joinButton.click();
-                    }
-                } catch (e) {
-                    console.error('Não foi possível acessar o conteúdo do iframe ou clicar no botão:', e);
-                }
-            });
-        });
-
-        exitButton.addEventListener('click', function() {
-            // Limpa o container de iframes
-            iframeContainer.innerHTML = '';
-        });
+        }
     </script>
-
 </body>
 </html>
